@@ -6,3 +6,9 @@
 /* fallback so it’s not invisible even if Tailwind isn’t ready */
 html, body, #root { height: 100%; }
 body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background: #f8fafc; }
+
+@media print {
+  .no-print { display: none !important; }          /* hides Sidebar + TopBar + any .no-print */
+  .print-pl-0 { padding-left: 0 !important; }      /* fallback if print: variant isn’t applied */
+  body { background: #fff !important; }            /* clean white PDF background */
+}
