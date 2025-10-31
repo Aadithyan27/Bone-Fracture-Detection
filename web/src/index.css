@@ -1,0 +1,8 @@
+/* Tailwind (if installed) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* fallback so it’s not invisible even if Tailwind isn’t ready */
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background: #f8fafc; }
