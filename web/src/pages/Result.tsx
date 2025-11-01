@@ -7,9 +7,12 @@ import ImageWithBoxes from "../components/ImageWithBoxes";
 
 export default function Result() {
   const nav = useNavigate();
-  const { state } = useLocation() as { state?: { file?: File; patient?: { name?: string; bodyPart?: string; age?: string | number } } };
+  const { state } = useLocation() as {
+    state?: { file?: File; patient?: { name?: string; bodyPart?: string; age?: string | number } };
+  };
 
-  const [conf, setConf] = React.useState<number>(0.5); // 0..1
+  // Default to 0.25 (25%) as requested
+  const [conf, setConf] = React.useState<number>(0.25); // 0..1
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [result, setResult] = React.useState<ApiImageResult | null>(null);
@@ -41,27 +44,32 @@ export default function Result() {
     }
   };
 
-  // Auto-run once
+  // Auto-run once if we already have a file
   React.useEffect(() => {
     if (file) handleRefresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
-  const fractured = result?.summary?.fractured ?? null;
+  // Status pill logic (treat healthy-only labels as "No Fracture")
+  const healthyAliases = ["healthy", "normal", "no fracture", "no_fracture", "negative"];
+  const isHealthyOnly =
+    !!result &&
+    Array.isArray(result.summary?.types) &&
+    result.summary.types.length > 0 &&
+    result.summary.types.every((t) => healthyAliases.some((h) => t.toLowerCase().includes(h)));
+
+  const fractured = result == null ? null : (isHealthyOnly ? false : !!result.summary?.fractured);
+
   const statusLabel =
     fractured === null ? "Awaiting Analysis"
     : fractured ? "Fracture Detected" : "No Fracture Detected";
+
   const statusClass =
     fractured === null
       ? "bg-slate-200 text-slate-800"
       : fractured
         ? "bg-rose-100 text-rose-700"
         : "bg-emerald-100 text-emerald-700";
-
-  // A simple confidence to display: max detection score (if any)
-  const displayConfidence = result?.detections?.length
-    ? Math.round(Math.max(...result.detections.map(d => d.score)) * 100)
-    : 100 - Math.round(conf * 100); // when no detections, show inverse of threshold for a friendly number
 
   // Print current page (export PDF via browser)
   const onExport = () => window.print();
@@ -112,7 +120,6 @@ export default function Result() {
             className="ml-2 inline-flex items-center gap-2 rounded-lg bg-white border px-3 py-2 text-slate-700 hover:bg-slate-50 shadow-sm"
             title="Export Report (PDF)"
           >
-            <span className="i-ph-download-simple" aria-hidden />
             Export Report
           </button>
         </div>
@@ -127,9 +134,10 @@ export default function Result() {
           max={100}
           step={1}
           value={Math.round(conf * 100)}
-          onChange={e => { const v = parseInt(e.target.value, 10) / 100; /* slider only */ setConf(v); }}
+          onChange={(e) => { const v = parseInt(e.target.value, 10) / 100; setConf(v); }}
           className="w-52"
         />
+        {/* Shows 25% at first load */}
         <span className="w-12 text-right">{Math.round(conf * 100)}%</span>
 
         <button
@@ -180,26 +188,22 @@ export default function Result() {
           <div className="p-5 space-y-4">
             <p className="text-slate-700 leading-relaxed">
               {fractured === null && "Run the analysis to view findings."}
+
               {fractured === false && (
-                <>The X-ray shows normal bone integrity with no visible signs of fractures or abnormalities.</>
+                <>
+                  {isHealthyOnly
+                    ? <>The X-ray shows no signs of fracture. Findings are consistent with a healthy/normal study.</>
+                    : <>No fracture detected.</>
+                  }
+                </>
               )}
+
               {fractured === true && (
-                <>AI indicates fracture evidence {result?.summary?.types?.length ? `(${result.summary.types.join(", ")})` : ""}. Please correlate clinically.</>
+                <>AI indicates fracture evidence{result?.summary?.types?.length ? ` (${result.summary.types.join(", ")})` : ""}. Please correlate clinically.</>
               )}
             </p>
 
-            <div>
-              <div className="flex items-center justify-between text-sm font-medium">
-                <span className="text-slate-600">Analysis Confidence</span>
-                <span className="text-indigo-700 font-semibold">{displayConfidence}%</span>
-              </div>
-              <div className="mt-2 h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-                <div
-                  className="h-full bg-indigo-600"
-                  style={{ width: `${displayConfidence}%` }}
-                />
-              </div>
-            </div>
+            {/* Removed the "Analysis Confidence" section per your request */}
 
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
               <div className="text-sm font-semibold text-emerald-800 mb-1">Medical Recommendations</div>
