@@ -1,7 +1,6 @@
 train: C:\Final project 2\backend\datasets\train\images
 val: C:\Final project 2\backend\datasets\valid\images
 test: C:\Final project 2\backend\datasets\test\images
-
 nc: 10
 names: ['Comminuted', 'Greenstick', 'Healthy', 'Linear', 'Oblique Displaced', 'Oblique', 'Segmental', 'Spiral', 'Transverse Displaced', 'Transverse']
 

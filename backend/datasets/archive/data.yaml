@@ -1,0 +1,13 @@
+train: C:\Final project 2\backend\datasets\train\images
+val: C:\Final project 2\backend\datasets\valid\images
+test: C:\Final project 2\backend\datasets\test\images
+
+nc: 10
+names: ['Comminuted', 'Greenstick', 'Healthy', 'Linear', 'Oblique Displaced', 'Oblique', 'Segmental', 'Spiral', 'Transverse Displaced', 'Transverse']
+
+roboflow:
+  workspace: iubat-i4ldm
+  project: bon-fracture-detection
+  version: 2
+  license: Private
+  url: https://app.roboflow.com/iubat-i4ldm/bon-fracture-detection/2
