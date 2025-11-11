@@ -1,0 +1,12 @@
+# Root dataset configuration for YOLOv8
+train: C:/Users/aadit/Downloads/BFD1/train/images
+val: C:/Users/aadit/Downloads/BFD1/valid/images
+
+# Optional but recommended (for test set)
+test: C:/Users/aadit/Downloads/BFD1/test/images
+
+# Number of classes
+nc: 1
+
+# Class names
+names: ['Fracture']
